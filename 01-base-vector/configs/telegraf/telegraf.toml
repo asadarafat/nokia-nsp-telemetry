@@ -1,0 +1,131 @@
+[agent]
+  interval       = "10s"
+  flush_interval = "10s"
+  omit_hostname  = true
+  debug          = true
+
+###############################################################################
+## INPUT: Kafka → JSON_v2
+###############################################################################
+[[inputs.kafka_consumer]]
+  brokers        = ["100.124.182.149:9192"]
+  topics         = ["ns-eg-5f088f68-b850-4ad7-b256-9ef238e67bf2", "ns-eg-6e2d0b2b-b57f-4a2c-a3a5-f2b258a3f40b"]
+  consumer_group = "telegraf-metrics-group"
+  offset         = "newest"
+  data_format    = "json_v2"
+  tls_ca         = "/etc/telegraf/certs/ca_cert.pem"
+  tls_cert       = "/etc/telegraf/certs/nsp_external_combined.pem"
+  tls_key        = "/etc/telegraf/certs/nsp.key"
+  insecure_skip_verify = false
+
+  [[inputs.kafka_consumer.json_v2]]
+    measurement_name   = "nsp_telemetry"
+    timestamp_path     = "data.ietf-restconf:notification.eventTime"
+    timestamp_format   = "RFC3339Nano"
+    timestamp_timezone = "UTC"
+
+    [[inputs.kafka_consumer.json_v2.object]]
+      path     = "data.ietf-restconf:notification.nsp-kpi:real_time_kpi-event"
+      optional = true
+
+      # fixed tags:
+      [[inputs.kafka_consumer.json_v2.object.tag]]
+        path   = "neId"
+        rename = "ne_id"
+        optional = true
+
+      [[inputs.kafka_consumer.json_v2.object.tag]]
+        path   = "system-id"   # capture *all* other JSON values as fields (auto‐detect number types)
+        rename = "system_id"
+        optional = true
+
+      [[inputs.kafka_consumer.json_v2.object.tag]]
+        path   = "kpiType"
+        rename = "kpi_type"
+        optional = true
+        
+      [[inputs.kafka_consumer.json_v2.object.tag]]
+        path   = "objectId"
+        rename = "object_id"
+        optional = true
+
+        # kpiType": "telemetry:/base/interfaces/utilization"
+        # tags
+        [[inputs.kafka_consumer.json_v2.object.tag]]
+          path   = "interface-id"
+          rename = "interface_id"
+          optional = true
+
+        # fields
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "received-octets-periodic"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "transmitted-octets-periodic"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "received-octets"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "transmitted-octets"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "input-utilization"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "output-utilization"
+          type     = "auto"
+          optional = true
+
+        # kpiType": "telemetry:/base/system-info/system"
+        # tags
+        [[inputs.kafka_consumer.json_v2.object.tag]]
+          path   = "memory-pool-name"
+          rename = "memory_pool_name"
+          optional = true
+
+        # fields
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "cpu-uage"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "memory-used"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "memory-available"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "memory-largest-available"
+          type     = "auto"
+          optional = true
+
+        [[inputs.kafka_consumer.json_v2.object.field]]
+          path     = "memory-allocated"
+          type     = "auto"
+          optional = true
+      
+###############################################################################
+## OUTPUTS
+###############################################################################
+[[outputs.prometheus_client]]
+  listen = ":9273"
+
+[[outputs.file]]
+  files       = ["/tmp/telegraf-debug.out"]
+  data_format = "json"

@@ -1,0 +1,15 @@
+current-cluster: NSP
+clusteroverride: ""
+clusters:
+- name: NSP
+  version: ""
+  brokers:
+  - ${NSP_IP}:${NSP_KAFKA_PORT}
+  TLS:
+    cafile: /opt/certs/ca_cert.pem
+    clientfile: /opt/certs/nsp_external_combined.pem
+    clientkeyfile: /opt/certs/nsp.key
+    insecure: false
+  security-protocol: SSL
+  schema-registry-url: ""
+  schema-registry-credentials: null
