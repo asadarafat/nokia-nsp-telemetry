@@ -1,3 +1,4 @@
 code
 clab-nsp-telemetry/**
 *.bak
+.gitignore

@@ -1,10 +1,9 @@
-# 📡 Scenario 01 – Base Vector: Dynamic NSP Telemetry Observability Pipeline
+# Scenario 01 – Base Vector: Dynamic NSP Telemetry Observability Pipeline
 
 **NSP Kafka → Vector (VRL) → Prometheus → Grafana**
 
----
 
-## 📘 Overview
+## Overview
 
 This proof-of-concept demonstrates how to transform **Kafka-based telemetry from Nokia NSP** into **Prometheus-compatible metrics** using [Vector.dev](https://vector.dev/) with [Vector Remap Language (VRL)](https://vector.dev/docs/reference/vrl/).
 
@@ -17,9 +16,8 @@ Instead of writing individual mappers (as is required in tools like Telegraf), *
 
 This scenario also includes **prebuilt Grafana dashboards** for immediate visualization of metrics like periodic CPU and memory usage.
 
----
 
-## 📊 Architecture
+## Architecture
 
 ```
 NSP Kafka → Vector (input → VRL transform → Prometheus sink) → Prometheus → Grafana
@@ -30,9 +28,8 @@ NSP Kafka → Vector (input → VRL transform → Prometheus sink) → Prometheu
 * **Prometheus** scrapes Vector’s Prometheus sink endpoint.
 * **Grafana** visualizes the results using predefined dashboards.
 
----
 
-## ⚙️ Why It Matters
+## Why It Matters
 
 Traditional telemetry stacks often require:
 
@@ -47,9 +44,8 @@ This PoC addresses those challenges by providing:
 
 It’s lightweight, scalable, and well-suited for evolving NSP telemetry models.
 
----
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Retrieve NSP Kafka Certificates
 
@@ -93,13 +89,12 @@ Open Grafana via the IP of the **Containerlab host**. The following dashboards a
 * **CPU Usage (Periodic)**
 * **Memory Usage (Periodic)**
 
----
 
-## 🧪 Containerlab Details
+## Containerlab Details
 
 This scenario uses [Containerlab](https://containerlab.dev/) for reproducible testbed deployment.
 
-### 🧷 Host Network Mode
+### Host Network Mode
 
 All containers run using `network_mode: host` to simplify inter-container communication and TLS-based Kafka access.
 
@@ -107,9 +102,8 @@ All containers run using `network_mode: host` to simplify inter-container commun
 containerlab deploy -t nokia-nsp-telemetry.clab.yaml
 ```
 
----
 
-## 📈 Dashboards
+## Dashboards
 
 Grafana includes two example dashboards:
 
@@ -118,9 +112,7 @@ Grafana includes two example dashboards:
 
 These panels are mapped to metrics normalized by Vector using VRL. You can easily extend or clone these dashboards to visualize other telemetry fields.
 
----
-
-## 🛠 Troubleshooting
+## Troubleshooting
 
 | Symptom                    | Likely Cause                       | Suggested Fix                                                    |
 | -------------------------- | ---------------------------------- | ---------------------------------------------------------------- |
@@ -129,14 +121,12 @@ These panels are mapped to metrics normalized by Vector using VRL. You can easil
 | Grafana shows no data      | Prometheus scraping issue          | Check Prometheus targets and test queries manually               |
 | `kaf` can’t consume topics | TLS error or topic mismatch        | Use `kaf topics` to confirm topic names and TLS config           |
 
----
 
-## 🧾 Summary
+## Summary
 
 This scenario proves that with **Vector and VRL**, it's possible to dynamically convert Nokia NSP’s structured Kafka telemetry into Prometheus metrics without per-metric mapping or manual scrapers. It serves as a **foundational pattern** for building more advanced pipelines (e.g., enrichment, gNMI support, or hybrid collectors).
 
----
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 The code and configurations in this scenario are provided for **proof-of-concept purposes only** and come with no warranties, express or implied. Use of this material is at your own risk. The authors and their employers assume no responsibility for any loss or disruption. Always validate thoroughly before considering any use in production environments.
