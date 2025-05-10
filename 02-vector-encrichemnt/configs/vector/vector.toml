@@ -1,0 +1,231 @@
+# vector.toml
+# author: asad.arafat@nokia.com
+
+
+[sources.token_file]
+type = "file"
+include = ["/tmp/access_token.txt"]
+read_from = "beginning"
+file_key = ""
+max_line_bytes = 1024000
+
+# Transform the token into a usable .access_token field
+[transforms.parse_token]
+type = "remap"
+inputs = ["token_file"]
+source = '''
+tokenStringRaw = string!(.message)
+.tokenStringRaw = .message
+
+'''
+
+# Output Data to File
+[sinks.to_file_parse_token]
+type = "file"
+inputs = ["parse_token"]
+path = "/tmp/vector_parse_token.out"
+encoding.codec = "json"
+encoding.json.pretty = true
+
+
+[sources.http_get]
+type = "http_client"
+inputs = ["parse_token"]
+endpoint = "https://${NSP_IP}/restconf/data/nsp-equipment:network/network-element/hardware-component/port?fields=ne-id;name;ne-name;description"
+method = "GET"
+auth.strategy = "bearer"
+auth.token = "${TOKEN}"
+headers.content-type = ["application/plain"]
+headers.accept = ["application/json"]
+scrape_interval_secs = 3600  # Refresh token every hour
+tls.verify_certificate = false
+decoding.codec = "json"
+## aarafat-tag: POST method not supported at the time of writing
+
+[sinks.to_file_http_get]
+type = "file"
+inputs = ["http_get"]
+path = "/tmp/vector_http_get.out"
+encoding.codec = "json"
+encoding.json.pretty = true
+
+[transforms.parse_ports]
+  type = "remap"
+  inputs = ["http_get"]
+  source = '''
+  port_array = []
+
+  for_each(array!(."nsp-equipment:port")) -> |idx, port| {
+    port_data  ={
+      "ne_id": port."ne-id",
+      "ne_name": port."ne-name",
+      "port_name": port.name,
+      "description": port.description
+    }
+      port_array = push(port_array, port_data)
+  }
+
+  del(.)
+  .port_enrichment_table = port_array
+
+  '''
+# Output Data to File
+[sinks.to_file_parse_ports]
+type = "file"
+inputs = ["parse_ports"]
+path = "/tmp/vector_parse_ports.out"
+encoding.codec = "json"
+encoding.json.pretty = true
+
+# ######
+# ######
+
+[sources.nsp_telemetry]
+  type = "kafka"
+  bootstrap_servers = "${NSP_IP}:${NSP_KAFKA_PORT}"
+  group_id = "vector-metrics-group"
+  topics = [${KAFKA_TOPICS}]
+  auto_offset_reset = "latest"
+  tls.enabled = true
+  tls.ca_file = "/etc/vector/certs/ca_cert.pem"
+  tls.crt_file = "/etc/vector/certs/nsp_external_combined.pem"
+  tls.key_file = "/etc/vector/certs/nsp.key"
+  tls.verify_certificate = true
+  decoding.codec = "json"
+
+[transforms.nsp_telemetry_to_prometheus]
+  type = "remap"
+  inputs = ["nsp_telemetry", "parse_ports"]
+  source = '''
+  # Create a new object to store string values as tags and fields
+  tags = {}
+  fields = {}
+
+  port_enrichment_table = .port_enrichment_table
+
+  # Create array metric_events
+  metric_events = []
+
+  # Extract the nested event payload
+  .event = get!(.data."ietf-restconf:notification", ["nsp-kpi:real_time_kpi-event"])
+
+  # Extract timestamp from time-captured (already in UNIX millis)
+  eventTime = get!(.data."ietf-restconf:notification", ["nsp-kpi:real_time_kpi-event", "time-captured"])
+
+  # Split fields into tags (strings) and fields (numbers)
+  for_each(object!(.event)) -> |key, value| {
+    # Check if the value is a string
+    if is_string(value) {
+      # Add string values to the tags object
+      tags = set!(value: tags, path: [key], data: value)
+
+      # for_each(array!(port_enrichment_table)) -> |idx, port| {
+      #   # if tags.neId == "20.1.1.1" {
+      #     tags.ne_name = "port.ne_name"
+      #   # }
+      # }
+
+    } else if is_integer(value) || is_float(value) {
+      # Add numeric values to the fields object
+      fields = set!(value: fields, path: [key], data: value)
+    }
+  }
+
+  # Clean up original event structure
+  del(.)  
+
+  # Retain tags and fields
+  . = set!(value: ., path: ["tags"], data: tags)
+  . = set!(value: ., path: ["fields"], data: fields)
+
+  # Dynamically sanitize tag keys for Prometheus
+  .sanitized_tags = {}
+  for_each(object!(tags)) -> |k, v| {
+    safe_key = replace(k, "-", "_")  # Define safe_key here
+    # You can add more replace() for other illegal chars
+    sanitized_tags = set!(value: .sanitized_tags, path: [safe_key], data: v)
+
+    # for_each(array!(.port_enrichment_table)) -> |idx, port_data| {
+    #   if sanitized_tags.neId == port_data.ne_id {
+    #     if sanitized_tags.interface_id == port_data.name {
+    #       sanitized_tags.description = port_data.description
+    #     }
+    #   }
+    # }
+
+    .sanitized_tags = sanitized_tags
+  }
+
+  .tags = .sanitized_tags 
+
+  # Safely convert kpiType to string and sanitize
+  safe_kpi = to_string(.tags.kpiType)
+  safe_kpi = replace!(safe_kpi, ":", "_")
+  safe_kpi = replace!(safe_kpi, "-", "_")
+  safe_kpi = replace!(safe_kpi, "/", "_")
+
+
+  # Create individual metric events
+  for_each(object!(.fields)) -> |k, v| {
+      if k != "time-captured" && k != "time-captured-periodic" {
+
+          metric, err = {
+              "name": "nsp_" + safe_kpi + "__" + replace(k, "-", "_") ,
+              "kind": "absolute",
+              "gauge": { "value": to_float(v) },
+              "tags": .tags,
+              "timestamp": (eventTime)
+          }
+          metric_events = push(metric_events, metric)
+      }
+  }
+
+  # Remove intermediate containers to avoid exporting them
+  del(.fields)  
+  del(.tags)
+  del(.sanitized_tags)
+
+  # put metric_events in the context
+  . = metric_events
+
+  # Emit final structure with list of metric events
+  .
+'''
+
+[transforms.to_metric_prometheus]
+  type = "log_to_metric"
+  inputs = ["nsp_telemetry_to_prometheus"]
+  all_metrics = true
+  metrics = []  # empty metrics list to satisfy validation
+
+[sinks.my_prometheus_exporter_sink]
+  type = "prometheus_exporter"
+  inputs = ["to_metric_prometheus"]
+  address = "0.0.0.0:9273"
+  flush_period_secs = 60
+
+
+# DEBUG SINK --> dump full JSON to a file so you can tail it
+[sinks.debug_file]
+  type = "file"
+  inputs = ["nsp_telemetry"]
+  path = "/tmp/vector_debug.out"
+  encoding.codec = "json"
+  encoding.json.pretty = true
+
+[sinks.debug_file_nsp_telemetry_to_prometheus]
+  type = "file"
+  inputs = ["nsp_telemetry_to_prometheus"]
+  path = "/tmp/vector_debug-prometeus.out"
+  encoding.codec = "json"
+  encoding.json.pretty = true
+  
+
+# [sources.vec_metrics] # useful for validating 
+#   type = "internal_metrics"
+
+# [sinks.my_prometheus_exporter_sink]
+#   type = "prometheus_exporter"
+#   inputs = ["vec_metrics"]
+#   address = "0.0.0.0:9273"
+#   flush_period_secs = 60

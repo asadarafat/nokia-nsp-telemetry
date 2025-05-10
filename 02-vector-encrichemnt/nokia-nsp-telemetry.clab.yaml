@@ -1,0 +1,135 @@
+### Architecture
+### 
+### NSP --> Vector -------------------------> prometeus --> grafana
+###         input --> transform --> sink
+###
+### Key Point:
+###  Supposed the NSP emitting Network ELemet telemetry metrics via kafka cluster.
+###  Vector consume it.
+###   
+###  Vector has Vector Remap Language (VRL) Vector Remap Language (VRL) is an expression-oriented language designed for transforming observability data (logs and metrics) in a safe and performant manner. 
+###  It features a simple syntax and a rich set of built-in functions tailored specifically to observability use cases.
+###  So, this makes the transformation of NSP kafka json to prometeus metrics can be done dynamically.
+### 
+### Quick start:
+### Get the NSP certificate to authenticate kafka.
+### Modify the configs/environment.env to spesify NSP_IP, NSP_KAFKA_PORT and KAFKA_TOPICS 
+### NSP_IP, NSP_KAFKA_PORT env variables will be used by kaf and vector
+### KAFKA_TOPICS will be used by vector
+###
+### kaf is kafka client. added to verify the NSP kafka.
+###
+
+name: nsp-telemetry
+#prefix: ""
+mgmt:
+  network: nokia-sp-lab-network
+  ipv4-subnet: 10.1.2.0/24
+  bridge: br1
+
+topology:
+  defaults:
+    env-files:
+      - ./configs/environment.env
+
+  nodes:
+    ## TELEMETRY STACK ###
+
+    kaf:
+      kind: linux
+      image: ghcr.io/asadarafat/kaf:v0.2.13
+      network-mode: host
+      binds:
+        - configs/kaf/kaf.config.template:/root/.kaf/config.template:ro
+        - configs/kaf/kaf.config.gen.sh:/root/.kaf/config.sh:rw
+        - certs:/opt/certs:ro   
+      user: root
+      cmd: /bin/bash -c "chmod 775 /root/.kaf/config.sh && /root/.kaf/config.sh && exec bash"
+      labels:
+        graph-icon: controller
+        graph-group: "TELEMETRY STACK"
+        graph-posX: "175"
+        graph-posY: "105"
+        graph-level: "1"
+        graph-groupLabelPos: bottom-center
+
+    python:
+      kind: linux
+      image: python:3.13.3-bookworm
+      network-mode: host
+      binds:
+        - configs/python/get_token.py:/root/get_token.py:rw
+        - configs/python/access_token.json:/tmp/access_token.json:rw
+        - configs/python/access_token.txt:/tmp/access_token.txt:rw
+      cmd: python /root/get_token.py
+      labels:
+        graph-icon: controller
+        graph-group: "TELEMETRY STACK"
+        graph-groupLabelPos: bottom-center
+
+    vector:
+      kind: linux
+      image: timberio/vector:0.46.1-debian
+      network-mode: host
+      binds:
+        - configs/vector/vector.toml:/etc/vector/vector.toml:ro
+        - certs:/etc/vector/certs:ro
+        - configs/python/access_token.json:/tmp/access_token.json:ro
+        - configs/python/access_token.txt:/tmp/access_token.txt:ro
+      ports:
+        - 9273:9273 # Prometheus Exporter
+      labels:
+        graph-icon: controller
+        graph-group: "TELEMETRY STACK"
+        graph-posX: "225"
+        graph-posY: "105"
+        graph-level: "1"
+        graph-groupLabelPos: bottom-center
+      env:
+        VECTOR_CONFIG: "/etc/vector/vector.toml"
+        VECTOR_LOG: "debug"
+      env-files:
+        - configs/python/access_token.txt
+
+    prometheus:
+      kind: linux
+      image: quay.io/prometheus/prometheus:v2.54.1
+      network-mode: host
+      binds:
+        - configs/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      cmd: --config.file=/etc/prometheus/prometheus.yaml
+      ports:
+        - 9090:9090
+      labels:
+        graph-icon: controller
+        graph-group: "TELEMETRY STACK"
+        graph-posX: "85"
+        graph-posY: "105"
+        graph-level: "1"
+        graph-groupLabelPos: bottom-center
+
+    grafana:
+      user: 0:0
+      kind: linux
+      image: grafana/grafana:11.2.0
+      network-mode: host
+      binds:
+        - configs/grafana/dashboards:/var/lib/grafana/dashboards
+        - configs/grafana/provisioning/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+        - configs/grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      ports:
+        - 3000:3000
+      env:
+        HTTP_PROXY: http://135.245.192.7:8000 # aarafat-tag: update to your environment
+        HTTPS_PROXY: http://135.245.192.7:8000 # aarafat-tag: update to your environment
+        NO_PROXY: localhost,127.0.0.1 # aarafat-tag: update to your environment
+        GF_AUTH_ANONYMOUS_ENABLED: "true"
+        GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+        GF_ORG_NAME: "Main Org"
+      labels:
+        graph-icon: controller
+        graph-group: "TELEMETRY STACK"
+        graph-posX: "135"
+        graph-posY: "105"
+        graph-level: "1"
+        graph-groupLabelPos: bottom-center
