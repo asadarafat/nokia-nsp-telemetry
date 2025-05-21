@@ -1,0 +1,658 @@
+=== ./configs/grafana/dashboards/all-ne-metrics.json ===
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 3,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "default": true,
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "nsp_telemetry__base_system_info_system__memory_used_periodic",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Memory Used Periodic - ALL Network Elements",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "default": true,
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "id": 1,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "nsp_telemetry__base_system_info_system__cpu_usage_periodic",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "CPU Usage Periodic - ALL Network Elements",
+        "type": "timeseries"
+      }
+    ],
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "ALL Network Elements Metrics",
+    "uid": "aele6foymkn40c",
+    "version": 5,
+    "weekStart": ""
+  }
+=== ./configs/grafana/dashboards/ne-20-1-1-1-metrics.json ===
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "nsp_telemetry__base_system_info_system__memory_used_periodic{neId=\"20.1.1.1\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "Memory used periodix",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "nsp_telemetry__base_system_info_system__cpu_usage_periodic{neId=\"20.1.1.1\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "CPU usage Periodic",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NE 20.1.1.1",
+  "uid": "aele5yn4xtxj4a",
+  "version": 4,
+  "weekStart": ""
+}
+=== ./clab-nsp-telemetry/topology-data.json ===
+{
+  "name": "nsp-telemetry",
+  "type": "clab",
+  "clab": {
+    "config": {
+      "prefix": "clab",
+      "mgmt": {
+        "network": "nokia-sp-lab-network",
+        "bridge": "br1",
+        "ipv4-subnet": "10.1.2.0/24",
+        "ipv4-gw": "10.1.2.203",
+        "ipv6-gw": "fe80::56ab:3aff:fe61:ef7f",
+        "external-access": true
+      }
+    }
+  },
+  "ssh-pub-keys": ["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7LucMP8R2XvhyELtI3Y2HbxB1VFWDuL58ndDmuCYqlf45GG6jIlHSqrCdu8EHcXDc8TU3vG1Fj0zQkZFbOehHcEFPk0h3SZ+j2zr/wjFq1qVV4mVQ6+NbH9vrc3z47+vjwvqVF56QWCGh8UxFaRS/POa4I+FtXWa6h3wlPgk4kZx67EM7dVJ0xTxKGOyoeNVwKZG8/yR66yHxKjSAd63SDnfYs4NHRJkJZQ0kCsjoZVKZsUw32HGa3OenPkLT73CCcPFQX1RzMR5hejAD9e7Pwrd2tGH0d9+sC39yvd1qQeDACgFTyJv+TL0gkRr0aSOzhpQwvemmLXauaq0bXiFeTUw7TlGP6Iq70EitCU+QUT03I2vjGM8O22/QfoWwklSeBl1TgTfIuFJf+EJCtxjaPhAqhmj7CJGWUphfR/oaWhmNSE+FAMzV/Ci7jbyIGMt/CmvbdbM36NUnT+1+c6TUvDsYK23NK5F3+VjfJHLRr2TrBXk6srONPCx7soooGa8="],
+  "nodes": {
+    "grafana": {
+      "index": "0",
+      "shortname": "grafana",
+      "longname": "clab-nsp-telemetry-grafana",
+      "fqdn": "grafana.nsp-telemetry.io",
+      "group": "",
+      "labdir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/grafana",
+      "kind": "linux",
+      "image": "grafana/grafana:11.2.0",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "",
+      "mgmt-ipv4-prefix-length": 0,
+      "mgmt-ipv6-address": "",
+      "mgmt-ipv6-prefix-length": 0,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br1",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/grafana",
+        "clab-node-longname": "clab-nsp-telemetry-grafana",
+        "clab-node-name": "grafana",
+        "clab-node-type": "",
+        "clab-owner": "suuser",
+        "clab-topo-file": "/home/suuser/nokia-nsp-telemetry/nokia-nsp-telemetry.clab.yaml",
+        "containerlab": "nsp-telemetry",
+        "graph-group": "TELEMETRY STACK",
+        "graph-groupLabelPos": "bottom-center",
+        "graph-icon": "controller",
+        "graph-level": "1",
+        "graph-posX": "135",
+        "graph-posY": "105"
+      },
+      "port-bindings": [
+      ]
+    },
+    "kaf": {
+      "index": "1",
+      "shortname": "kaf",
+      "longname": "clab-nsp-telemetry-kaf",
+      "fqdn": "kaf.nsp-telemetry.io",
+      "group": "",
+      "labdir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/kaf",
+      "kind": "linux",
+      "image": "ghcr.io/asadarafat/kaf:v0.2.13",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "",
+      "mgmt-ipv4-prefix-length": 0,
+      "mgmt-ipv6-address": "",
+      "mgmt-ipv6-prefix-length": 0,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br1",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/kaf",
+        "clab-node-longname": "clab-nsp-telemetry-kaf",
+        "clab-node-name": "kaf",
+        "clab-node-type": "",
+        "clab-owner": "suuser",
+        "clab-topo-file": "/home/suuser/nokia-nsp-telemetry/nokia-nsp-telemetry.clab.yaml",
+        "containerlab": "nsp-telemetry",
+        "graph-group": "TELEMETRY STACK",
+        "graph-groupLabelPos": "bottom-center",
+        "graph-icon": "controller",
+        "graph-level": "1",
+        "graph-posX": "175",
+        "graph-posY": "105"
+      },
+      "port-bindings": [
+      ]
+    },
+    "prometheus": {
+      "index": "2",
+      "shortname": "prometheus",
+      "longname": "clab-nsp-telemetry-prometheus",
+      "fqdn": "prometheus.nsp-telemetry.io",
+      "group": "",
+      "labdir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/prometheus",
+      "kind": "linux",
+      "image": "quay.io/prometheus/prometheus:v2.54.1",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "",
+      "mgmt-ipv4-prefix-length": 0,
+      "mgmt-ipv6-address": "",
+      "mgmt-ipv6-prefix-length": 0,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br1",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/prometheus",
+        "clab-node-longname": "clab-nsp-telemetry-prometheus",
+        "clab-node-name": "prometheus",
+        "clab-node-type": "",
+        "clab-owner": "suuser",
+        "clab-topo-file": "/home/suuser/nokia-nsp-telemetry/nokia-nsp-telemetry.clab.yaml",
+        "containerlab": "nsp-telemetry",
+        "graph-group": "TELEMETRY STACK",
+        "graph-groupLabelPos": "bottom-center",
+        "graph-icon": "controller",
+        "graph-level": "1",
+        "graph-posX": "85",
+        "graph-posY": "105"
+      },
+      "port-bindings": [
+      ]
+    },
+    "vector": {
+      "index": "3",
+      "shortname": "vector",
+      "longname": "clab-nsp-telemetry-vector",
+      "fqdn": "vector.nsp-telemetry.io",
+      "group": "",
+      "labdir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/vector",
+      "kind": "linux",
+      "image": "timberio/vector:0.46.1-debian",
+      "mgmt-net": "",
+      "mgmt-intf": "",
+      "mgmt-ipv4-address": "",
+      "mgmt-ipv4-prefix-length": 0,
+      "mgmt-ipv6-address": "",
+      "mgmt-ipv6-prefix-length": 0,
+      "mac-address": "",
+      "labels": {
+        "clab-mgmt-net-bridge": "br1",
+        "clab-node-group": "",
+        "clab-node-kind": "linux",
+        "clab-node-lab-dir": "/home/suuser/nokia-nsp-telemetry/clab-nsp-telemetry/vector",
+        "clab-node-longname": "clab-nsp-telemetry-vector",
+        "clab-node-name": "vector",
+        "clab-node-type": "",
+        "clab-owner": "suuser",
+        "clab-topo-file": "/home/suuser/nokia-nsp-telemetry/nokia-nsp-telemetry.clab.yaml",
+        "containerlab": "nsp-telemetry",
+        "graph-group": "TELEMETRY STACK",
+        "graph-groupLabelPos": "bottom-center",
+        "graph-icon": "controller",
+        "graph-level": "1",
+        "graph-posX": "225",
+        "graph-posY": "105"
+      },
+      "port-bindings": [
+      ]
+    }
+  },
+  "links": [
+  ]
+}
+

@@ -1,0 +1,85 @@
+# vector.toml
+# author: asad.arafat@nokia.com
+
+[sources.nsp_telemetry]
+type = "kafka"
+bootstrap_servers = "100.124.182.149:9192"
+group_id = "vector-metrics-group"
+topics = [
+  "ns-eg-5f088f68-b850-4ad7-b256-9ef238e67bf2",
+  "ns-eg-6e2d0b2b-b57f-4a2c-a3a5-f2b258a3f40b",
+]
+auto_offset_reset = "latest"
+tls.enabled = true
+tls.ca_file = "/etc/vector/certs/ca_cert.pem"
+tls.crt_file = "/etc/vector/certs/nsp_external_combined.pem"
+tls.key_file = "/etc/vector/certs/nsp.key"
+tls.verify_certificate = true
+decoding.codec = "json"
+
+
+[transforms.nsp_telemetry_to_prometheus]
+type = "remap"
+inputs = ["nsp_telemetry"]
+source = '''
+# Create a new object to store string values as tags and fields
+tags = {}
+fields = {}
+
+.event = get!(.data."ietf-restconf:notification", ["nsp-kpi:real_time_kpi-event"])
+
+# Iterate through each key-value pair
+for_each(object!(.event)) -> |key, value| {
+  # Check if the value is a string
+  if is_string(value) {
+    # Add string values to the tags object
+    tags = set!(value: tags, path: [key], data: value)
+  } else if is_integer(value) || is_float(value) {
+    # Add numeric values to the fields object
+    fields = set!(value: fields, path: [key], data: value)
+  }
+}
+
+
+del(.)  
+
+# Set the tags object in the result
+. = set!(value: ., path: ["tags"], data: tags)
+
+# Set the fields object in the result
+. = set!(value: ., path: ["fields"], data: fields)
+
+
+# Return the modified result
+.
+
+'''
+
+# DEBUG SINK → dump full JSON to a file so you can tail it
+[sinks.debug_file]
+type = "file"
+inputs = ["nsp_telemetry"]
+path = "/tmp/vector-debug.out"
+encoding.codec = "json"
+encoding.json.pretty = true
+
+[sinks.debug_file_nsp_telemetry_to_prometheus]
+type = "file"
+inputs = ["nsp_telemetry_to_prometheus"]
+path = "/tmp/vector-debug-prometeus.out"
+encoding.codec = "json"
+encoding.json.pretty = true
+
+
+[transforms.convert_to_metrics]
+type = "log_to_metric"
+inputs = ["nsp_telemetry_to_prometheus"]
+metrics_from_fields = "fields"
+tags = ["tags"]
+
+
+[sinks.prometheus_exporter]
+type = "prometheus_exporter"
+inputs = ["convert_to_metrics"]
+address = "0.0.0.0:9273"
+namespace = "nsp"
